@@ -105,8 +105,6 @@ export async function POST(req: NextRequest) {
       </html>
     `;
 
-    await page.setContent(finalHtml, { waitUntil: "networkidle0" });
-
     const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,
@@ -114,6 +112,11 @@ export async function POST(req: NextRequest) {
     });
 
     await browser.close();
+
+    const webStandardBuffer = new Uint8Array(pdfBuffer);
+
+    // 2. Create the Blob from this new, type-safe buffer.
+    const pdfBlob = new Blob([webStandardBuffer], { type: "application/pdf" });
 
     const sanitizedTitle = (documentTitle || "document")
       .replace(/[^a-z0-9]/gi, "_")
@@ -125,7 +128,8 @@ export async function POST(req: NextRequest) {
       `attachment; filename="${sanitizedTitle}.pdf"`
     );
 
-    return new NextResponse(pdfBuffer, { headers });
+    // 3. Pass the valid Blob to the NextResponse.
+    return new NextResponse(pdfBlob, { headers });
   } catch (error) {
     console.error("PDF Generation Error:", error);
     if (error instanceof Error && error.message.includes("ENOENT")) {
