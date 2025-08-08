@@ -25,9 +25,12 @@ export default function RootLayout({
           inter.className
         )}
       >
-        <div className="flex min-h-screen w-full flex-col">
+        <div className="flex h-screen w-full flex-col">
           <Header />
-          <main className="flex flex-1 flex-col">{children}</main>
+          {/* The <main> tag now grows to fill the remaining space and handles overflow */}
+          <main className="flex flex-1 flex-col overflow-hidden">
+            {children}
+          </main>
         </div>
         <Toaster richColors />
       </body>

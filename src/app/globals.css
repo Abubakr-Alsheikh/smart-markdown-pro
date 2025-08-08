@@ -284,4 +284,35 @@
   .prose :where(hr):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     @apply my-8 border-border;
   }
+  /* --- Custom Scrollbar Styling --- */
+
+  /* This first part is for Webkit-based browsers (Chrome, Edge, Safari) */
+  /* It allows for detailed customization of the scrollbar's parts. */
+  ::-webkit-scrollbar {
+    @apply w-2; /* Sets the width of the scrollbar (8px) */
+  }
+
+  ::-webkit-scrollbar-track {
+    /* The "track" or the gutter of the scrollbar */
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    /* The draggable "thumb" of the scrollbar */
+    @apply rounded-full bg-border bg-gray-700  transition-colors;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    /* The thumb's color when the user hovers over it */
+    @apply bg-primary;
+  }
+
+  /* This second part is for Firefox and other browsers that support the W3C standard */
+  /* It's less customizable but provides a good fallback. */
+  /* We apply it to the root so it's the default everywhere. */
+  html {
+    scrollbar-width: thin; /* "auto" or "thin" */
+    /* scrollbar-color: [thumb-color] [track-color] */
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
 }
