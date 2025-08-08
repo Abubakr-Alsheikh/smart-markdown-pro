@@ -121,7 +121,7 @@ export function FileManagementSidebar() {
             <DialogTitle>Are you absolutely sure?</DialogTitle>
             <DialogDescription>
               This action cannot be undone. This will permanently delete the
-              document titled "{docToDelete?.title}".
+              document titled {docToDelete?.title}.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
