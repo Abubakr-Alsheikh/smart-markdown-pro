@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FilePlus2, PanelLeft, Trash2 } from "lucide-react";
-import { Separator } from "../ui/separator";
 import { ExportControls } from "../export/export-controls";
 
 export function FileManagementSidebar() {
@@ -75,7 +74,10 @@ export function FileManagementSidebar() {
               New Document
             </Button>
           </div>
-          <ScrollArea className="flex-1 px-4">
+
+          {/* --- THIS IS THE FIX --- */}
+          {/* Add the `min-h-0` class to the ScrollArea component */}
+          <ScrollArea className="flex-1 min-h-0 px-4">
             <div className="flex flex-col gap-2 pb-4">
               {documentList.map((doc) => (
                 <div
@@ -101,7 +103,7 @@ export function FileManagementSidebar() {
                     size="icon"
                     className="h-8 w-8 opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevent setting doc as active
+                      e.stopPropagation();
                       handleDeleteClick(doc);
                     }}
                   >
