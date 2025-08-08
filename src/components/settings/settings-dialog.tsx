@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useSettingsStore } from "@/lib/store/useSettingsStore";
+import { useSettingsStore, SavedFont } from "@/lib/store/useSettingsStore";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,52 +10,77 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ExternalLink, Settings, Trash2, X } from "lucide-react";
+import Link from "next/link";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { ExternalLink, Settings, X } from "lucide-react";
-import Link from "next/link";
-import { toast } from "sonner";
+
+// A simple utility to extract the primary font name for display
+const parseFontName = (fontFamily: string): string => {
+  if (!fontFamily) return "Default";
+  return fontFamily.split(",")[0].replace(/['"]/g, "").trim();
+};
 
 export function SettingsDialog() {
-  const {
-    isRTL,
-    fontSize,
-    fontLink,
-    fontFamily,
-    toggleRTL,
-    setFontSize,
-    setFont,
-    resetFont,
-  } = useSettingsStore();
+  // --- THIS IS THE FIX ---
+  // Select each piece of state individually.
+  const isRTL = useSettingsStore((state) => state.isRTL);
+  const fontSize = useSettingsStore((state) => state.fontSize);
+  const toggleRTL = useSettingsStore((state) => state.toggleRTL);
+  const setFontSize = useSettingsStore((state) => state.setFontSize);
+  const activeFontFamily = useSettingsStore((state) => state.activeFontFamily);
+  const savedFonts = useSettingsStore((state) => state.savedFonts);
+  const setActiveFont = useSettingsStore((state) => state.setActiveFont);
+  const saveAndApplyNewFont = useSettingsStore(
+    (state) => state.saveAndApplyNewFont
+  );
+  const resetActiveFont = useSettingsStore((state) => state.resetActiveFont);
+  const deleteSavedFont = useSettingsStore((state) => state.deleteSavedFont);
 
-  const [localLink, setLocalLink] = React.useState(fontLink);
-  const [localFamily, setLocalFamily] = React.useState(fontFamily);
+  // Local state for the input fields
+  const [newLink, setNewLink] = React.useState("");
+  const [newFamily, setNewFamily] = React.useState("");
 
-  const handleApplyFont = () => {
-    // Basic validation
-    if (!localLink.startsWith("https://fonts.googleapis.com/css2?family=")) {
-      toast.error("Invalid Google Fonts URL.", {
-        description: "Please paste the full <link> `href` value.",
-      });
+  const handleApplyNewFont = () => {
+    if (!newLink.startsWith("https://fonts.googleapis.com/css2?family=")) {
+      toast.error("Invalid Google Fonts URL.");
       return;
     }
-    if (!localFamily.includes(",")) {
-      toast.error("Invalid CSS Font Family.", {
-        description: 'It should look like: "Roboto", sans-serif',
-      });
+    if (!newFamily.includes(",")) {
+      toast.error("Invalid CSS Font Family value.");
       return;
     }
-    setFont(localLink, localFamily);
-    toast.success("Custom font applied!");
+
+    const newFont: SavedFont = { family: newFamily, link: newLink };
+    saveAndApplyNewFont(newFont);
+
+    // Clear inputs after successful save
+    setNewLink("");
+    setNewFamily("");
+    toast.success(`Font "${parseFontName(newFamily)}" saved and applied!`);
   };
 
-  const handleResetFont = () => {
-    resetFont();
-    setLocalLink("");
-    setLocalFamily("");
-    toast.info("Font has been reset to default.");
+  const handleSelectFont = (family: string) => {
+    if (family === "default") {
+      resetActiveFont();
+      toast.info("Font reset to default.");
+    } else {
+      const fontToApply = savedFonts.find((f) => f.family === family);
+      if (fontToApply) {
+        setActiveFont(fontToApply);
+        toast.success(`Applied font: "${parseFontName(family)}"`);
+      }
+    }
   };
 
   return (
@@ -94,50 +119,84 @@ export function SettingsDialog() {
             />
           </div>
 
-          {/* --- NEW FONT CONTROLS SECTION --- */}
           <div className="grid gap-4 rounded-lg border p-4">
             <h3 className="font-semibold">Custom Font</h3>
-            <div className="text-sm text-muted-foreground">
-              Go to{" "}
-              <Link
-                href="https://fonts.google.com"
-                target="_blank"
-                className="inline-flex items-center text-primary underline underline-offset-4"
-              >
-                Google Fonts <ExternalLink className="ml-1 h-3 w-3" />
-              </Link>
-              , choose a font, and copy the values below.
-            </div>
 
+            {/* --- FONT SELECTOR --- */}
             <div className="grid gap-2">
-              <Label htmlFor="font-link">1. Embed Link URL</Label>
-              <Input
-                id="font-link"
-                placeholder="https://fonts.googleapis.com/css2?family=..."
-                value={localLink}
-                onChange={(e) => setLocalLink(e.target.value)}
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="font-family">2. CSS `font-family` Value</Label>
-              <Input
-                id="font-family"
-                placeholder='"Font Name", sans-serif'
-                value={localFamily}
-                onChange={(e) => setLocalFamily(e.target.value)}
-              />
-            </div>
-
-            <div className="flex justify-between">
-              <Button
-                variant="ghost"
-                onClick={handleResetFont}
-                className="text-destructive hover:text-destructive"
+              <Label>Active Font</Label>
+              <Select
+                onValueChange={handleSelectFont}
+                value={activeFontFamily || "default"}
               >
-                <X className="mr-2 h-4 w-4" /> Reset
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a font" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="default">Default Font</SelectItem>
+                  {savedFonts.map((font) => (
+                    <div
+                      key={font.family}
+                      className="flex items-center justify-between pr-2"
+                    >
+                      <SelectItem value={font.family}>
+                        {parseFontName(font.family)}
+                      </SelectItem>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteSavedFont(font.family);
+                          toast.error(
+                            `Removed font "${parseFontName(font.family)}"`
+                          );
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* --- ADD NEW FONT FORM --- */}
+            <div className="mt-4 border-t pt-4">
+              <p className="mb-2 text-sm font-medium">Add a New Font</p>
+              <div className="text-sm text-muted-foreground mb-4">
+                Go to{" "}
+                <Link
+                  href="https://fonts.google.com"
+                  target="_blank"
+                  className="inline-flex items-center text-primary underline underline-offset-4"
+                >
+                  Google Fonts <ExternalLink className="ml-1 h-3 w-3" />
+                </Link>
+                , choose a font, and copy the values below.
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="font-link">1. Embed Link URL</Label>
+                <Input
+                  id="font-link"
+                  value={newLink}
+                  onChange={(e) => setNewLink(e.target.value)}
+                  placeholder="https://fonts.googleapis.com/css2?family=..."
+                />
+              </div>
+              <div className="grid gap-2 mt-2">
+                <Label htmlFor="font-family">2. CSS `font-family` Value</Label>
+                <Input
+                  id="font-family"
+                  value={newFamily}
+                  onChange={(e) => setNewFamily(e.target.value)}
+                  placeholder='"Font Name", sans-serif'
+                />
+              </div>
+              <Button onClick={handleApplyNewFont} className="mt-4 w-full">
+                Save and Apply
               </Button>
-              <Button onClick={handleApplyFont}>Apply Font</Button>
             </div>
           </div>
         </div>
