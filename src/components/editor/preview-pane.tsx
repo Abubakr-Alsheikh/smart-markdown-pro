@@ -1,31 +1,28 @@
 "use client";
 
-// Import our new settings store
-import { useSettingsStore } from "@/lib/store/useSettingsStore";
 import { useDocumentStore } from "@/lib/store/useDocumentStore";
+import { useSettingsStore } from "@/lib/store/useSettingsStore";
 import { cn } from "@/lib/utils";
+import React from "react"; // Import React for CSSProperties
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import rehypePrism from "rehype-prism-plus";
 
 export function PreviewPane() {
-  // Get the content from the document store
   const content = useDocumentStore((state) => {
     if (!state.activeDocumentId) return "";
     return state.documents[state.activeDocumentId]?.content ?? "";
   });
 
-  // Get the settings from the settings store
   const { isRTL, fontSize } = useSettingsStore();
 
   return (
     <div
-      // Add the dir and style props here
       dir={isRTL ? "rtl" : "ltr"}
       style={
         {
-          "font-size": `${fontSize}px`,
+          fontSize: `${fontSize}px`,
         } as React.CSSProperties
       }
       className={cn(

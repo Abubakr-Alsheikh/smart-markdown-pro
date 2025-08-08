@@ -123,7 +123,7 @@
 
   /* --- Comprehensive Prose Styling for Markdown Preview --- */
   .prose {
-    @apply max-w-none text-foreground text-[var(--preview-font-size,16px)];
+    @apply max-w-none text-foreground;
   }
   /* --- Vertical Rhythm --- */
   .prose
@@ -147,22 +147,27 @@
     @apply font-bold tracking-tight text-foreground;
   }
   .prose :where(h1):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-    @apply text-4xl font-extrabold mb-6 mt-8 border-b pb-2;
+    font-size: 2.25em;
+    @apply mb-6 mt-8 border-b pb-2;
   }
   .prose :where(h2):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-    @apply text-3xl font-semibold mb-5 mt-8 border-b pb-2;
+    font-size: 1.875em;
+    @apply font-semibold mb-5 mt-8 border-b pb-2;
   }
   .prose :where(h3):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-    @apply text-2xl font-semibold mb-4 mt-6;
+    font-size: 1.5em;
+    @apply font-semibold mb-4 mt-6;
   }
   .prose :where(h4):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-    @apply text-xl font-semibold mb-3 mt-5;
+    font-size: 1.25em;
+    @apply font-semibold mb-3 mt-5;
   }
 
   /* --- Body Text & Links --- */
   .prose :where(p):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-    @apply leading-7 text-base mb-4 text-foreground/90;
+    @apply leading-7 mb-4 text-foreground/90;
   }
+
   .prose :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     @apply text-primary underline underline-offset-4 transition-colors hover:text-primary/80;
   }
