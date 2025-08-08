@@ -3,14 +3,18 @@
 import { useDocumentStore } from "@/lib/store/useDocumentStore";
 
 export function EditorPane() {
-  const { getActiveDocument, updateActiveDocumentContent } = useDocumentStore();
-  const activeDocument = getActiveDocument();
+  const activeDocument = useDocumentStore((state) =>
+    state.activeDocumentId ? state.documents[state.activeDocumentId] : null
+  );
 
-  // Handle case where no document is active
+  const updateActiveDocumentContent = useDocumentStore(
+    (state) => state.updateActiveDocumentContent
+  );
+
   if (!activeDocument) {
     return (
-      <div className="flex h-full w-full items-center justify-center text-muted-foreground">
-        Select a document or create a new one to start writing.
+      <div className="flex h-full w-full items-center justify-center p-4 text-center text-muted-foreground">
+        Select a document from the sidebar or create a new one to start writing.
       </div>
     );
   }
@@ -18,7 +22,7 @@ export function EditorPane() {
   return (
     <div className="h-full w-full">
       <textarea
-        key={activeDocument.id} // IMPORTANT: Force re-render when switching docs
+        key={activeDocument.id}
         value={activeDocument.content}
         onChange={(e) => updateActiveDocumentContent(e.target.value)}
         className="h-full w-full resize-none border-none bg-transparent p-4 font-mono text-base outline-none"

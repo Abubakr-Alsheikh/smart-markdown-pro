@@ -5,11 +5,12 @@ import { Loader2, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useAiFormat } from "@/lib/hooks/useAiFormat";
-import { useDocumentStore } from "@/lib/store/useDocumentStore";
+import { useDocumentStore } from "@/lib/store/useDocumentStore"; // Keep this import
 
 export function AiFormatButton() {
   const { format, isFormatting } = useAiFormat();
-  const { getActiveDocument, updateActiveDocumentContent } = useDocumentStore();
+  const { getActiveDocument, updateActiveDocumentContent } =
+    useDocumentStore.getState();
 
   const handleFormatClick = async () => {
     const activeDocument = getActiveDocument();
@@ -27,7 +28,7 @@ export function AiFormatButton() {
 
     try {
       const result = await format({ text: activeDocument.content });
-      updateActiveDocumentContent(result.formattedText); // Update the active doc
+      updateActiveDocumentContent(result.formattedText);
       toast.success("Formatting complete!");
     } catch (error) {
       console.error("Formatting error:", error);
