@@ -1,5 +1,7 @@
 "use client";
 
+"use client";
+// ... (imports remain the same)
 import { useDocumentStore } from "@/lib/store/useDocumentStore";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
@@ -9,8 +11,13 @@ import rehypeRaw from "rehype-raw";
 import rehypePrism from "rehype-prism-plus";
 
 export function PreviewPane() {
-  const content = useDocumentStore((state) => state.content);
+  const getActiveDocument = useDocumentStore(
+    (state) => state.getActiveDocument
+  );
+  const activeDocument = getActiveDocument();
+  const content = activeDocument?.content || "";
 
+  // ... (rest of the component is identical)
   return (
     <div
       className={cn(

@@ -9,10 +9,16 @@ import { useDocumentStore } from "@/lib/store/useDocumentStore";
 
 export function AiFormatButton() {
   const { format, isFormatting } = useAiFormat();
-  const { content, setContent } = useDocumentStore();
+  const { getActiveDocument, updateActiveDocumentContent } = useDocumentStore();
 
   const handleFormatClick = async () => {
-    if (!content.trim()) {
+    const activeDocument = getActiveDocument();
+    if (!activeDocument) {
+      toast.error("No active document to format.");
+      return;
+    }
+
+    if (!activeDocument.content.trim()) {
       toast.info("There is no text to format.");
       return;
     }
@@ -20,8 +26,8 @@ export function AiFormatButton() {
     toast.info("AI is formatting your text...");
 
     try {
-      const result = await format({ text: content });
-      setContent(result.formattedText);
+      const result = await format({ text: activeDocument.content });
+      updateActiveDocumentContent(result.formattedText); // Update the active doc
       toast.success("Formatting complete!");
     } catch (error) {
       console.error("Formatting error:", error);
