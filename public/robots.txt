@@ -1,0 +1,6 @@
+# Allow all user agents to crawl the site
+User-agent: *
+Allow: /
+
+# Specify the location of the sitemap
+Sitemap: https://smart-markdown-pro.vercel.app/sitemap.xml
