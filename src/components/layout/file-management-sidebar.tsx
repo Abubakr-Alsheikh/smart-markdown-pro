@@ -25,6 +25,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FilePlus2, PanelLeft, Trash2 } from "lucide-react";
 import { Separator } from "../ui/separator";
+import { ExportControls } from "../export/export-controls";
 
 export function FileManagementSidebar() {
   const {
@@ -64,25 +65,24 @@ export function FileManagementSidebar() {
             <span className="sr-only">Toggle Documents Sidebar</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="flex flex-col">
-          <SheetHeader>
+        <SheetContent side="left" className="flex flex-col p-0">
+          <SheetHeader className="p-4 pb-0">
             <SheetTitle>My Documents</SheetTitle>
           </SheetHeader>
-          <div className="px-4">
+          <div className="p-4">
             <Button onClick={addDocument} className="w-full">
               <FilePlus2 className="mr-2 h-4 w-4" />
               New Document
             </Button>
           </div>
-          <Separator />
-          <ScrollArea className="flex-1">
-            <div className="flex flex-col gap-2 pr-7">
+          <ScrollArea className="flex-1 px-4">
+            <div className="flex flex-col gap-2 pb-4">
               {documentList.map((doc) => (
                 <div
                   key={doc.id}
                   onClick={() => setActiveDocumentId(doc.id)}
                   className={cn(
-                    "group flex cursor-pointer items-center justify-between rounded-md border p-3 m-3 mt-0 w-full text-sm transition-colors",
+                    "group flex cursor-pointer items-center justify-between rounded-md border p-3 text-sm transition-colors",
                     activeDocumentId === doc.id
                       ? "border-primary bg-muted"
                       : "hover:bg-muted/50"
@@ -111,6 +111,8 @@ export function FileManagementSidebar() {
               ))}
             </div>
           </ScrollArea>
+
+          <ExportControls />
         </SheetContent>
       </Sheet>
 
