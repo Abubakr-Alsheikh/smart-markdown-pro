@@ -15,15 +15,19 @@ export function PreviewPane() {
     return state.documents[state.activeDocumentId]?.content ?? "";
   });
 
-  const { isRTL, fontSize } = useSettingsStore();
+  const { isRTL, fontSize, fontFamily } = useSettingsStore();
 
-  // THIS IS THE NEW, SIMPLIFIED STRUCTURE
-  // A simple div that handles scrolling for its child.
   return (
     <div className="h-full w-full overflow-y-auto">
       <div
         dir={isRTL ? "rtl" : "ltr"}
-        style={{ fontSize: `${fontSize}px` } as React.CSSProperties}
+        style={
+          {
+            fontSize: `${fontSize}px`,
+            // If a custom fontFamily is set, use it. Otherwise, do nothing.
+            ...(fontFamily && { fontFamily: fontFamily }),
+          } as React.CSSProperties
+        }
         className={cn(
           "prose prose-invert max-w-none min-h-full w-full p-4 focus:outline-none"
         )}

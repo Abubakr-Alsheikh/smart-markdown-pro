@@ -12,13 +12,14 @@ export const metadata: Metadata = {
   description: "AI-Powered Markdown Editor",
 };
 
+import { FontLoader } from "@/components/settings/font-loader"; // <-- Import
+
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className="dark">
+      <FontLoader /> {/* <-- Add the component here */}
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
