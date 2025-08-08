@@ -1,12 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { useDocumentStore } from "@/lib/store/useDocumentStore";
 import { AiFormatButton } from "@/components/editor/ai-format-button";
 import { FileManagementSidebar } from "./file-management-sidebar";
-import { Input } from "@/components/ui/input";
-
 import { SettingsDialog } from "../settings/settings-dialog";
 import { ThemeToggle } from "../theme/theme-toggle";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Github, Sparkles } from "lucide-react"; // Import Github icon
 
 export function Header() {
   const activeDocument = useDocumentStore((state) =>
@@ -18,14 +20,26 @@ export function Header() {
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
-      <FileManagementSidebar />
+      {/* --- Left Side: Branding and File Management --- */}
+      <div className="flex items-center gap-4">
+        <FileManagementSidebar />
+        <Link
+          href="/"
+          className="flex items-center gap-2 font-semibold text-foreground"
+        >
+          <Sparkles className="h-6 w-6" />
+          <span className="hidden sm:inline-block">Smart Markdown Pro</span>
+        </Link>
+      </div>
+
+      {/* --- Center: Active Document Title --- */}
       <div className="flex-1">
         {activeDocument ? (
           <Input
             key={activeDocument.id}
             defaultValue={activeDocument.title}
             onChange={(e) => updateActiveDocumentTitle(e.target.value)}
-            className="w-full max-w-sm border-none bg-transparent text-lg font-semibold focus-visible:ring-0"
+            className="w-full max-w-sm border bg-transparent text-lg font-semibold focus-visible:ring-0"
           />
         ) : (
           <div className="w-full max-w-sm text-lg font-semibold text-muted-foreground">
@@ -33,8 +47,21 @@ export function Header() {
           </div>
         )}
       </div>
+
+      {/* --- Right Side: Actions --- */}
       <div className="ml-auto flex items-center gap-2">
         <AiFormatButton />
+
+        <Link
+          href="https://github.com/Abubakr-Alsheikh/smart-markdown-pro"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Button variant="outline" size="icon" aria-label="GitHub Repository">
+            <Github className="h-5 w-5" />
+          </Button>
+        </Link>
+
         <ThemeToggle />
         <SettingsDialog />
       </div>
