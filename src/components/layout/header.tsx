@@ -5,6 +5,8 @@ import { AiFormatButton } from "@/components/editor/ai-format-button";
 import { FileManagementSidebar } from "./file-management-sidebar";
 import { Input } from "@/components/ui/input";
 
+import { SettingsDialog } from "../settings/settings-dialog"; // <-- Import
+
 export function Header() {
   const activeDocument = useDocumentStore((state) =>
     state.activeDocumentId ? state.documents[state.activeDocumentId] : null
@@ -30,8 +32,9 @@ export function Header() {
           </div>
         )}
       </div>
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center gap-2">
         <AiFormatButton />
+        <SettingsDialog />
       </div>
     </header>
   );
