@@ -121,7 +121,7 @@
     @apply bg-background text-foreground;
   }
 
-  /* --- Comprehensive Prose Styling for Markdown Preview --- */
+  /* --- DEFINITIVE Prose Styling for All Markdown Elements --- */
   .prose {
     @apply max-w-none text-foreground;
   }
@@ -139,7 +139,7 @@
     @apply mb-0;
   }
 
-  /* --- Headings --- */
+  /* --- Headings (h1-h6) --- */
   .prose
     :where(h1, h2, h3, h4, h5, h6):not(
       :where([class~="not-prose"], [class~="not-prose"] *)
@@ -148,38 +148,49 @@
   }
   .prose :where(h1):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     font-size: 2.25em;
-    @apply mb-6 mt-8 border-b pb-2;
+    @apply mt-2 mb-6 border-b pb-2;
   }
   .prose :where(h2):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     font-size: 1.875em;
-    @apply font-semibold mb-5 mt-8 border-b pb-2;
+    @apply mt-2 mb-5 border-b pb-2 font-semibold;
   }
   .prose :where(h3):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     font-size: 1.5em;
-    @apply font-semibold mb-4 mt-6;
+    @apply mt-2 mb-4 font-semibold;
   }
   .prose :where(h4):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     font-size: 1.25em;
-    @apply font-semibold mb-3 mt-5;
+    @apply mt-2 mb-3 font-semibold;
+  }
+  .prose :where(h5):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+    font-size: 1.125em;
+    @apply mt-2 mb-2 font-semibold;
+  }
+  .prose :where(h6):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+    font-size: 1em;
+    @apply mt-2 mb-2 font-semibold text-muted-foreground;
   }
 
-  /* --- Body Text & Links --- */
+  /* --- Body Text, Emphasis & Links --- */
   .prose :where(p):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     @apply leading-7 mb-4 text-foreground/90;
   }
-
   .prose :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-    @apply text-primary underline underline-offset-4 transition-colors hover:text-primary/80;
+    @apply text-primary underline underline-offset-4 hover:text-primary/90 font-medium;
   }
   .prose
     :where(strong):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     @apply font-semibold text-foreground;
   }
+  .prose
+    :where(em, i):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+    @apply italic;
+  }
 
-  /* --- Lists & Task Lists --- */
+  /* --- Lists (Ordered & Unordered) --- */
   .prose
     :where(ul, ol):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-    @apply mb-5 pl-6;
+    @apply mb-5 px-6;
   }
   .prose :where(ul):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     @apply list-disc;
@@ -190,12 +201,15 @@
   .prose :where(li):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     @apply mb-2;
   }
+  /* Handle spacing for nested lists */
   .prose
     :where(li > ul, li > ol):not(
       :where([class~="not-prose"], [class~="not-prose"] *)
     ) {
     @apply mt-2;
   }
+
+  /* --- Checkbox List --- */
   .prose
     :where(li.task-list-item):not(
       :where([class~="not-prose"], [class~="not-prose"] *)
@@ -217,29 +231,25 @@
     background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
   }
 
-  /* --- Blockquotes, Rules, and Thematic Breaks --- */
+  /* --- Blockquotes --- */
   .prose
     :where(blockquote):not(
       :where([class~="not-prose"], [class~="not-prose"] *)
     ) {
-    @apply mt-6 mb-6 border-l-4 pl-4 italic text-muted-foreground;
+    @apply mt-6 mb-6 border-s-4 ps-4 italic text-muted-foreground;
   }
-  .prose :where(hr):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-    @apply my-8 border-border;
-  }
-
-  /* --- Code Blocks & Inline Code --- */
+  /* Style for nested blockquotes */
   .prose
-    :where(code):not(
-      :where(pre *, [class~="not-prose"], [class~="not-prose"] *)
+    :where(blockquote > blockquote):not(
+      :where([class~="not-prose"], [class~="not-prose"] *)
     ) {
-    @apply relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold text-foreground;
-  }
-  .prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-    @apply mb-4 mt-6 overflow-x-auto rounded-lg p-4;
+    @apply mt-4 border-s-primary/70 ps-4;
   }
 
-  /* --- Tables --- */
+  /* --- Images & Tables --- */
+  .prose :where(img):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+    @apply my-2 inline-block rounded-sm border bg-muted;
+  }
   .prose
     :where(table):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     @apply my-6 w-full overflow-hidden rounded-lg border;
@@ -249,18 +259,29 @@
     @apply border-b bg-muted;
   }
   .prose :where(th):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-    @apply px-4 py-2 text-left font-bold;
+    @apply px-4 py-2 text-start font-bold;
   }
   .prose
     :where(tbody tr):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-    @apply border-b border-muted;
+    @apply border-b border-muted transition-colors hover:bg-muted/50;
   }
   .prose :where(td):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     @apply px-4 py-2;
   }
 
-  /* --- Images --- */
-  .prose :where(img):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-    @apply my-2 inline-block rounded-sm;
+  /* --- Code (Inline & Block) --- */
+  .prose
+    :where(code):not(
+      :where(pre *, [class~="not-prose"], [class~="not-prose"] *)
+    ) {
+    @apply relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold;
+  }
+  .prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+    @apply mb-4 mt-6 overflow-x-auto rounded-lg p-4;
+  }
+
+  /* --- Horizontal Rules --- */
+  .prose :where(hr):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+    @apply my-8 border-border;
   }
 }
