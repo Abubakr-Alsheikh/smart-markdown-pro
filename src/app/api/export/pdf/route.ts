@@ -1,27 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
 import puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
+import fs from "fs/promises"; // <-- Import Node.js File System module
+import path from "path"; // <-- Import Node.js Path module
 
-// Helper function to fetch the application's global CSS (no change here)
+// Helper function to fetch the application's global CSS by reading the file
 async function getAppCss() {
-  const url = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}/globals.css`
-    : "http://localhost:3000/globals.css";
   try {
-    const response = await fetch(url, { cache: "no-store" });
-    if (!response.ok)
-      throw new Error(`Failed to fetch CSS: ${response.statusText}`);
-    return await response.text();
+    // Construct the correct path to the globals.css file
+    // process.cwd() gives the root of your project
+    const cssPath = path.join(process.cwd(), "src", "app", "globals.css");
+    const css = await fs.readFile(cssPath, "utf-8");
+
+    // Also read the prism theme file
+    const prismPath = path.join(
+      process.cwd(),
+      "src",
+      "styles",
+      "prism-tomorrow.css"
+    );
+    const prismCss = await fs.readFile(prismPath, "utf-8");
+
+    // Combine both stylesheets
+    return `${css}\n${prismCss}`;
   } catch (error) {
-    console.error(`Error fetching CSS from ${url}:`, error);
-    return "";
+    console.error("Error reading CSS files:", error);
+    return ""; // Return empty string on failure
   }
 }
 
 export async function POST(req: NextRequest) {
   let browser = null;
   try {
-    const { htmlContent, documentTitle } = await req.json();
+    const { htmlContent, documentTitle, settings } = await req.json();
     if (!htmlContent) {
       return NextResponse.json(
         { error: "Missing htmlContent" },
@@ -29,13 +40,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // This now reads the files directly from the disk
     const appCss = await getAppCss();
 
-    // --- THIS IS THE ENVIRONMENT-AWARE FIX ---
-    let executablePath: string;
+    const direction = settings?.isRTL ? "rtl" : "ltr";
+    const inlineStyles = [
+      settings?.fontSize ? `font-size: ${settings.fontSize}px;` : "",
+      settings?.fontFamily ? `font-family: ${settings.fontFamily};` : "",
+    ].join(" ");
 
+    let executablePath: string;
     if (process.env.VERCEL) {
-      // Use the serverless-optimized chromium package on Vercel
       executablePath = await chromium.executablePath();
     } else {
       // For local development, use your locally installed Chrome browser.
@@ -46,37 +61,59 @@ export async function POST(req: NextRequest) {
       // macOS:   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
       // Linux:   '/usr/bin/google-chrome'
       const localChromePath =
-        "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"; // <-- CHECK AND UPDATE THIS PATH
+        "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
       executablePath = localChromePath;
     }
 
-    // --- MODERNIZED LAUNCH OPTIONS ---
     browser = await puppeteer.launch({
       executablePath,
-      args: process.env.VERCEL ? chromium.args : [], // Use chromium args only on Vercel
-      headless: "shell", // The modern headless mode
+      args: process.env.VERCEL ? chromium.args : [],
+      headless: "shell",
     });
-    // --- END OF FIXES ---
 
     const page = await browser.newPage();
-    await page.setContent(
-      `
+
+    // Construct the final HTML for Puppeteer
+    const finalHtml = `
       <!DOCTYPE html>
-      <html>
-        <head><style>${appCss}</style></head>
+      <html lang="en">
+        <head>
+          <meta charset="UTF--8">
+          <style>${appCss}</style>
+          ${
+            // Inject the Google Font link if it exists
+            settings?.fontFamily
+              ? `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=${settings.fontFamily
+                  .split(",")[0]
+                  .replace(/['"]/g, "")
+                  .replace(
+                    " ",
+                    "+"
+                  )}:wght@200..700&display=swap" rel="stylesheet">`
+              : ""
+          }
+        </head>
         <body class="dark bg-background">
-          <div class="prose prose-invert p-4">${htmlContent}</div>
+          <div 
+            class="prose prose-invert p-4"
+            dir="${direction}" 
+            style="${inlineStyles}"
+          >
+            ${htmlContent}
+          </div>
         </body>
       </html>
-    `,
-      { waitUntil: "networkidle0" }
-    );
+    `;
+
+    await page.setContent(finalHtml, { waitUntil: "networkidle0" });
 
     const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,
       margin: { top: "0.5in", right: "0.5in", bottom: "0.5in", left: "0.5in" },
     });
+
+    await browser.close();
 
     const sanitizedTitle = (documentTitle || "document")
       .replace(/[^a-z0-9]/gi, "_")

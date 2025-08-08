@@ -5,6 +5,7 @@ import { useDocumentStore } from "@/lib/store/useDocumentStore";
 import { Button } from "@/components/ui/button";
 import { Download, Copy, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useSettingsStore } from "@/lib/store/useSettingsStore"; // <-- Import settings store
 
 // Keep the downloadFile helper, as it's still useful!
 function downloadFile(content: Blob, fileName: string) {
@@ -24,6 +25,9 @@ export function ExportControls() {
   const activeDocument = useDocumentStore((state) =>
     state.activeDocumentId ? state.documents[state.activeDocumentId] : null
   );
+
+  // Get the settings from the store
+  const { isRTL, fontSize, activeFontFamily } = useSettingsStore();
 
   const handleDownloadMarkdown = () => {
     if (!activeDocument) return;
@@ -70,13 +74,20 @@ export function ExportControls() {
     toast.info("Generating PDF on our server, please wait...");
 
     try {
-      // 1. Call our new backend endpoint
+      // --- THIS IS THE CHANGE ---
+      // Call our backend endpoint with all the necessary data
       const response = await fetch("/api/export/pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           htmlContent: previewElement.innerHTML,
           documentTitle: activeDocument.title,
+          // Pass the customization settings
+          settings: {
+            isRTL,
+            fontSize,
+            fontFamily: activeFontFamily,
+          },
         }),
       });
 
