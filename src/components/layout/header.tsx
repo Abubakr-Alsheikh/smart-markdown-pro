@@ -5,7 +5,8 @@ import { AiFormatButton } from "@/components/editor/ai-format-button";
 import { FileManagementSidebar } from "./file-management-sidebar";
 import { Input } from "@/components/ui/input";
 
-import { SettingsDialog } from "../settings/settings-dialog"; // <-- Import
+import { SettingsDialog } from "../settings/settings-dialog";
+import { ThemeToggle } from "../theme/theme-toggle";
 
 export function Header() {
   const activeDocument = useDocumentStore((state) =>
@@ -34,6 +35,7 @@ export function Header() {
       </div>
       <div className="ml-auto flex items-center gap-2">
         <AiFormatButton />
+        <ThemeToggle />
         <SettingsDialog />
       </div>
     </header>

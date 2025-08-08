@@ -4,6 +4,8 @@ import { Toaster } from "@/components/ui/sonner"; // Shadcn uses Sonner for toas
 import { cn } from "@/lib/utils";
 import { Header } from "@/components/layout/header";
 import "./globals.css";
+import { FontLoader } from "@/components/settings/font-loader";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -12,28 +14,34 @@ export const metadata: Metadata = {
   description: "AI-Powered Markdown Editor",
 };
 
-import { FontLoader } from "@/components/settings/font-loader"; // <-- Import
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="dark">
-      <FontLoader /> {/* <-- Add the component here */}
+    <html lang="en" suppressHydrationWarning>
+      {" "}
+      {/* <-- Add suppressHydrationWarning */}
+      <FontLoader />
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
           inter.className
         )}
       >
-        <div className="flex h-screen w-full flex-col">
-          <Header />
-          {/* The <main> tag now grows to fill the remaining space and handles overflow */}
-          <main className="flex flex-1 flex-col overflow-hidden">
-            {children}
-          </main>
-        </div>
-        <Toaster richColors />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="flex h-screen w-full flex-col">
+            <Header />
+            <main className="flex flex-1 flex-col overflow-hidden">
+              {children}
+            </main>
+          </div>
+          <Toaster richColors />
+        </ThemeProvider>
       </body>
     </html>
   );
