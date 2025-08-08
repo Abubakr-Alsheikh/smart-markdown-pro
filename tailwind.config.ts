@@ -20,6 +20,17 @@ const config = {
     },
   },
   plugins: [tailwindcssAnimate, tailwindcssTypography],
+  // --- THIS IS THE FIX ---
+  // Add this section to your config file.
+  // corePlugins: {
+  //   preflight: true, // Keep preflight enabled
+  // },
+  future: {
+    // Disable modern color format features
+    modernEquivalents: false,
+    respectDefaultRingColorOpacity: false,
+    disableColorOpacityUtilitiesByDefault: false,
+  },
 } satisfies Config;
 
 export default config;
