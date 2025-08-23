@@ -8,9 +8,12 @@ import { SettingsDialog } from "../settings/settings-dialog";
 import { ThemeToggle } from "../theme/theme-toggle";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Github, Sparkles } from "lucide-react"; // Import Github icon
+import { Github, Sparkles, ChevronsLeft, ChevronsRight } from "lucide-react"; // Import Github icon
+import { useLayoutStore } from "@/lib/store/useLayoutStore";
 
 export function Header() {
+  const { isEditorCollapsed, isPreviewCollapsed, toggleEditor, togglePreview } =
+    useLayoutStore();
   const activeDocument = useDocumentStore((state) =>
     state.activeDocumentId ? state.documents[state.activeDocumentId] : null
   );
@@ -50,6 +53,30 @@ export function Header() {
 
       {/* --- Right Side: Actions --- */}
       <div className="ml-auto flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={toggleEditor}
+          aria-label={isEditorCollapsed ? "Open Editor" : "Collapse Editor"}
+        >
+          {isEditorCollapsed ? (
+            <ChevronsRight className="h-5 w-5" />
+          ) : (
+            <ChevronsLeft className="h-5 w-5" />
+          )}
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={togglePreview}
+          aria-label={isPreviewCollapsed ? "Open Preview" : "Collapse Preview"}
+        >
+          {isPreviewCollapsed ? (
+            <ChevronsLeft className="h-5 w-5" />
+          ) : (
+            <ChevronsRight className="h-5 w-5" />
+          )}
+        </Button>
         <AiFormatButton />
 
         <Link
