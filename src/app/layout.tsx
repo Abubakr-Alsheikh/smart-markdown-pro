@@ -7,6 +7,7 @@ import "./globals.css";
 import { FontLoader } from "@/components/settings/font-loader";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import "katex/dist/katex.min.css";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -113,6 +114,7 @@ export default function RootLayout({
           </div>
           <Toaster richColors />
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
