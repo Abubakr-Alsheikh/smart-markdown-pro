@@ -8,6 +8,8 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import rehypePrism from "rehype-prism-plus";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 
 export function PreviewPane() {
   const content = useDocumentStore((state) => {
@@ -18,7 +20,7 @@ export function PreviewPane() {
   const { isRTL, fontSize, activeFontFamily } = useSettingsStore();
 
   return (
-    <div className="h-full w-full overflow-y-auto">
+    <div className="h-full w-full overflow-y-auto relative">
       <div
         dir={isRTL ? "rtl" : "ltr"}
         style={
@@ -32,9 +34,10 @@ export function PreviewPane() {
         )}
       >
         <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
+          remarkPlugins={[remarkGfm, remarkMath]}
           rehypePlugins={[
             rehypeRaw,
+            rehypeKatex,
             [rehypePrism, { showLineNumbers: true, ignoreMissing: true }],
           ]}
         >
